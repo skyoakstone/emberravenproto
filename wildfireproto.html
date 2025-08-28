@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Wildfire Preparedness – Resource Navigator</title>
+<style>
+:root{
+  --bg:#999999;           /* light background */
+  --card:#ffffff;         /* white cards */
+  --muted:#475569;        /* slate-600 */
+  --text:#4d5f88;         /* near-black text */
+  --accent:#16a34a;       /* green-600 */
+  --accent-2:#0369a1;     /* sky-700 (links) */
+  --accent-3:#b45309;     /* amber-700 */
+  --danger:#dc2626;       /* red-600 */
+  --chip:#f1f5f9;         /* slate-100 */
+  --border:#e5e7eb;       /* gray-200 */
+}
+
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Helvetica,Arial;
+  }
+  a{color:var(--accent-2); text-decoration:none}
+  header, .container{max-width:980px; margin:0 auto; padding:16px}
+  header{
+    display:flex; align-items:center; gap:12px; justify-content:space-between; border-bottom:1px solid var(--border);
+  }
+  .logo{display:flex; align-items:center; gap:8px; font-weight:700}
+  .logo .icon{font-size:24px}
+  .nav{display:flex; gap:16px; font-size:14px; color:#cbd5e1}
+  .hero{padding:24px 16px}
+  h1{font-size:28px; margin:0 0 8px}
+  .sub{color:#484c51; margin-bottom:16px}
+  .address{
+    display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:20px;
+  }
+  .input{
+    background:#0b1220; border:1px solid var(--border); color:var(--text);
+    padding:12px 14px; border-radius:10px; min-width:260px; flex:1;
+  }
+  .btn{
+    background:var(--accent); color:#032414; border:0; padding:12px 16px; border-radius:10px;
+    font-weight:700; cursor:pointer;
+  }
+  .btn.secondary{background:#0b1220; color:#cbd5e1; border:1px solid var(--border)}
+  .grid{
+    display:grid; gap:12px; grid-template-columns:repeat(1, minmax(0,1fr));
+  }
+  @media (min-width:640px){ .grid{grid-template-columns:repeat(2,1fr)} }
+  @media (min-width:900px){ .grid{grid-template-columns:repeat(3,1fr)} }
+  .card-toggle{
+    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;
+    display:flex; gap:12px; align-items:flex-start; position:relative; transition:transform .05s ease;
+  }
+  .card-toggle:active{transform:scale(.99)}
+  .card-toggle[aria-pressed="true"]{ outline:2px solid var(--accent); }
+  .card-toggle .ico{font-size:22px; margin-top:2px}
+  .card-toggle .title{font-weight:700; margin-bottom:4px}
+  .card-toggle .desc{color:#cbd5e1; font-size:14px}
+  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 6px}
+  .chip{background:var(--chip); border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:13px}
+  .warn{color:#fca5a5; font-size:13px}
+  .section-title{margin:18px 0 8px; font-size:18px; font-weight:800}
+  .divider{height:1px; background:var(--border); margin:14px 0}
+  /* Accordion */
+  .accordion{margin:18px 0}
+  .acc-item{border:1px solid var(--border); border-radius:14px; margin-bottom:12px; overflow:hidden; background:var(--card)}
+  .acc-head{
+    display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; font-weight:700;
+  }
+  .acc-body{display:none; padding:10px 12px 14px}
+  .acc-item[data-open="true"] .acc-body{display:block}
+  .subgrid{display:grid; gap:10px; grid-template-columns:repeat(1, minmax(0,1fr))}
+  @media (min-width:640px){ .subgrid{grid-template-columns:repeat(2,1fr)} }
+  .sub-toggle{
+    display:block; width:100%; text-align:left; padding:12px; border-radius:12px; border:1px solid var(--border);
+    background:#0b1220; color:var(--text); cursor:pointer;
+  }
+  .sub-toggle[aria-pressed="true"]{background:#0f1a30; outline:2px solid var(--accent-2)}
+  .acc-actions{display:flex; justify-content:flex-end; gap:8px; padding:10px 0 0}
+  .btn.small{padding:10px 12px; font-size:14px; border-radius:10px}
+  .btn.ghost{background:transparent; color:#cbd5e1; border:1px solid var(--border)}
+  /* Report */
+  .report{margin:22px 0 100px}
+  .panel{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; background:var(--card)}
+  .panel h3{margin:0; padding:14px 16px; background:#0b1220; border-bottom:1px solid var(--border); font-size:16px}
+  .panel .content{padding:12px}
+  .list{display:grid; gap:10px}
+  .item{border:1px solid var(--border); border-radius:12px; padding:10px; background:#0b1220}
+  .tag{display:inline-block; padding:2px 8px; border-radius:999px; background:#0f1a30; border:1px solid var(--border); font-size:12px; color:#cbd5e1}
+  .sprite{display:flex; gap:10px; align-items:flex-start}
+  .sticky-footer{
+    position:fixed; left:0; right:0; bottom:0; background:#0b1220; border-top:1px solid var(--border);
+    padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+  }
+  .footer-cta{background:#111827; border:1px solid var(--border); color:#e5e7eb; padding:10px 14px; border-radius:10px; cursor:pointer}
+  .footer-cta.primary{background:var(--accent); color:#032414; border:0}
+  .muted{color:#cbd5e1}
+</style>
+</head>
+<body>
+  <header>
+    <div class="logo"><span class="icon">🔥</span> Wildfire Preparedness</div>
+    <nav class="nav">
+      <span>How it works</span><span>Get a Plan</span><span>About</span>
+    </nav>
+  </header>
+
+  <div class="container hero">
+    <h1>Find wildfire help for your situation</h1>
+    <p class="sub">Pick what you want to work on; we’ll show programs, local contractors, and key info for your area.</p>
+
+    <div class="address">
+      <input class="input" id="addr" placeholder="Enter address (optional)" />
+      <button class="btn" id="useAddr">Use Address</button>
+      <button class="btn secondary" id="skipAddr">Skip</button>
+    </div>
+
+    <div class="section-title">What do you want to focus on today? <span class="muted">(Pick up to two)</span></div>
+    <div id="chips" class="chipbar" aria-live="polite"></div>
+
+    <!-- STEP 1: Categories -->
+    <div id="categories" class="grid" role="group" aria-label="Focus areas">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <p id="catWarn" class="warn" style="display:none">You can select up to two focus areas.</p>
+
+    <!-- STEP 2: Accordion Wizard (hidden until categories picked) -->
+    <div id="accordion" class="accordion" style="display:none" aria-label="Sub-actions wizard">
+      <!-- Accordion items injected here -->
+    </div>
+
+    <!-- STEP 3: Report -->
+    <div id="report" class="report" style="display:none">
+      <h2 class="section-title">Your Resource Report</h2>
+      <p class="muted" id="reportBasedOn"></p>
+
+      <!-- Emergency -->
+      <div class="panel" id="emergencyPanel">
+        <h3>Emergency Contacts & Alerts</h3>
+        <div class="content list" id="emergencyList">
+          <!-- Emergency items injected -->
+        </div>
+      </div>
+
+      <!-- Programs -->
+      <div class="panel" id="assistPanel">
+        <h3>Find Assistance</h3>
+        <div class="content list" id="assistList">
+          <!-- Program cards injected -->
+        </div>
+      </div>
+
+      <!-- Contractors -->
+      <div class="panel" id="contractPanel">
+        <h3>Find Contractors</h3>
+        <div class="content list" id="contractList">
+          <!-- Contractor cards injected -->
+        </div>
+      </div>
+
+      <!-- Learn More -->
+      <div class="panel">
+        <h3>Learn More</h3>
+        <div class="content list" id="learnList">
+          <div class="item sprite">
+            <div>✨</div>
+            <div><strong>Did you know?</strong><br/>60% of homes ignite from embers, not direct flames.</div>
+          </div>
+          <!-- Microcards injected -->
+          <div class="item"><a href="#" class="muted">Explore all educational resources →</a></div>
+        </div>
+      </div>
+
+      <!-- Expand report -->
+      <div class="panel">
+        <h3>➕ Want to expand your report?</h3>
+        <div class="content list" id="expandList">
+          <!-- Suggestion tiles injected -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky footer CTAs -->
+  <div class="sticky-footer" id="footerCtas" style="display:none">
+    <button class="footer-cta">Download Report (PDF)</button>
+    <button class="footer-cta">Find Contractors</button>
+    <button class="footer-cta">Find Assistance</button>
+    <span class="muted" style="flex-basis:100%; text-align:center">Want a complete Wildfire Plan? <a href="#">Take 10-min assessment</a> or <a href="#">Book free in-person assessment</a></span>
+  </div>
+
+<script>
+/* ------------------------------
+   Data (placeholder mock)
+   Replace with Airtable/Softr data sources later
+--------------------------------*/
+const CATEGORIES = [
+  { id:"prepare", icon:"🧭", title:"Prepare for Wildfire", desc:"Plans, insurance, pets, go-bags" },
+  { id:"harden", icon:"🏠", title:"Harden Your Home", desc:"Roof, gutters, vents, windows" },
+  { id:"defensible", icon:"🛡️", title:"Create Defensible Space", desc:"Near-home landscaping & hardscape" },
+  { id:"treat", icon:"🌲", title:"Treat Your Land", desc:"Thinning, biomass cleanup, restoration" },
+  { id:"infra", icon:"🚰", title:"Improve Infrastructure", desc:"Fuel breaks, roads, irrigation" },
+  { id:"neighbors", icon:"👥", title:"Work with Neighbors", desc:"Firewise, phone trees, mapping" },
+];
+
+const SUBACTIONS = {
+  harden: [
+    { id:"roof", label:"Roof Cleaning", blurb:"Clear debris to reduce embers." },
+    { id:"gutters", label:"Gutter Cleaning", blurb:"Remove leaves & needles." },
+    { id:"vents", label:"Vent Replacement", blurb:"Install ember mesh to block sparks." },
+    { id:"windows", label:"Windows & Siding", blurb:"Upgrade weak points." },
+    { id:"decks", label:"Attached Decks & Fences", blurb:"Avoid ember 'fuses' to the house." },
+    { id:"assessment", label:"Home Fire Risk Assessment", blurb:"DIY or professional check-up." },
+  ],
+  defensible: [
+    { id:"zone0", label:"Clear 0–5 ft Zone", blurb:"Create an ignition buffer." },
+    { id:"plants", label:"Firesafe Landscaping", blurb:"Spacing & plant choices." },
+    { id:"hardscape", label:"Hardscaping", blurb:"Stone borders, gravel, patios." },
+    { id:"nearTrees", label:"Trim Trees Near Home", blurb:"Remove ladder fuels." },
+    { id:"fencesNear", label:"Fences & Decks Near House", blurb:"Break ember pathways." },
+    { id:"smallWater", label:"Small-Scale Watering", blurb:"Irrigate defensible space." },
+  ],
+  prepare: [
+    { id:"gobag", label:"Go Bags / Kits", blurb:"Essentials ready to go." },
+    { id:"evac", label:"Evacuation Planning", blurb:"Routes & reunification." },
+    { id:"ins", label:"Insurance & Docs Prep", blurb:"Coverage, belongings, critical docs." },
+    { id:"alerts", label:"Emergency Alerts & Apps", blurb:"Sign up & configure." },
+    { id:"pets", label:"Pets & Livestock", blurb:"Plan for animals." },
+    { id:"smoke", label:"Smoke Preparedness", blurb:"Masks, air purifiers, safe room." },
+  ],
+  treat: [
+    { id:"thin", label:"Thinning & Fuels Reduction", blurb:"Reduce fuel continuity." },
+    { id:"biomass", label:"Biomass Cleanup & Removal", blurb:"Dispose or utilize safely." },
+    { id:"arborist", label:"Arborist / Tree Removal", blurb:"Larger trees, hazard limbs." },
+    { id:"forest", label:"Forest Management", blurb:"Long-term stewardship." },
+    { id:"rx", label:"Prescribed Fire (Pro)", blurb:"Expert-guided burning." },
+    { id:"native", label:"Native Plant Restoration", blurb:"Resilient plant communities." },
+  ],
+  infra: [
+    { id:"breaks", label:"Fuel Breaks", blurb:"Strategic breaks on property." },
+    { id:"ingress", label:"Ingress/Egress Planning", blurb:"Road access & safety." },
+    { id:"roads", label:"Rural Road Work", blurb:"Roadside clearance." },
+    { id:"irrig", label:"Irrigation Systems", blurb:"Property-scale water." },
+    { id:"harvest", label:"Rainwater Harvesting", blurb:"Tanks/ponds for fire use." },
+    { id:"erosion", label:"Flooding & Erosion", blurb:"Stabilize vulnerable areas." },
+  ],
+  neighbors: [
+    { id:"firewise", label:"Firewise Community", blurb:"Start or join a group." },
+    { id:"liaisons", label:"Community Liaisons", blurb:"Point people & info flow." },
+    { id:"phone", label:"Phone Trees", blurb:"Fast neighbor alerts." },
+    { id:"mapping", label:"Risk & Resource Mapping", blurb:"Shared situational awareness." },
+    { id:"vol", label:"Volunteering", blurb:"Local orgs & events." },
+  ]
+};
+
+// Simple placeholder “database” returns:
+function mockEmergency() {
+  return [
+    { name:"Fire District", phone:"(555) 123-4567", link:"https://alerts.example.org" },
+    { name:"County Sheriff", phone:"(555) 765-4321", link:"https://sheriff.example.org" },
+    { name:"Local Alerts", phone:"", link:"https://signup.example.org" },
+  ];
+}
+function mockPrograms(selectedCats, subacts) {
+  const base = [
+    { name:"Defensible Space Rebate", desc:"Cost-share for near-home clearing.", tags:["Deadline Sept 30","Verified Aug 2025"], match:["defensible"] },
+    { name:"Home Hardening Grant", desc:"Offsets vent/window upgrades.", tags:["Open Now","Verified Aug 2025"], match:["harden"] },
+    { name:"Forest Thinning Cost-Share", desc:"Per-acre support for fuels reduction.", tags:["Waitlist","Verified Aug 2025"], match:["treat"] },
+    { name:"Community Mini-Grant", desc:"Neighborhood Firewise projects.", tags:["Quarterly","Verified Aug 2025"], match:["neighbors"] },
+  ];
+  return base.filter(p => p.match.some(m => selectedCats.includes(m)));
+}
+function mockContractors(selectedCats, subacts) {
+  const base = [
+    { name:"Evergreen Arborists", services:["Trim Trees Near Home","Arborist / Tree Removal"], area:"Jackson/Josephine", status:"Verified Aug 2025" },
+    { name:"SparkSafe Roofing", services:["Roof Cleaning","Gutter Cleaning","Vent Replacement"], area:"Rogue Valley", status:"Insured" },
+    { name:"ShieldScape", services:["Clear 0–5 ft Zone","Hardscaping","Fences & Decks Near House"], area:"Applegate", status:"Community Verified" },
+    { name:"LandCare Fuels", services:["Thinning & Fuels Reduction","Biomass Cleanup & Removal"], area:"South County", status:"Verified Aug 2025" },
+  ];
+  // naive filter: include if any subaction label appears
+  return base.filter(c => c.services.some(s => subacts.some(sa => s.includes(sa.label))));
+}
+function microcardsFor(subacts){
+  const picks = subacts.slice(0,2).map(sa => ({
+    title: sa.label,
+    why: sa.label.includes("Vent") ? "Embers enter openings > 1/8\"." : "Reduces ember ignition risk.",
+    how: sa.label.includes("Vent") ? "Install ember-resistant mesh vents." : "Remove fuels and maintain clearances.",
+    link: "#"
+  }));
+  if (picks.length===0) picks.push({title:"Firesafe Landscaping", why:"Plants near walls act like kindling.", how:"Swap bark mulch for gravel near siding.", link:"#"});
+  return picks;
+}
+function suggestExpansions(selectedCats){
+  const pool = [
+    { cat:"prepare", title:"Prepare for Wildfire: Go Bag" },
+    { cat:"neighbors", title:"Work with Neighbors: Firewise Group" },
+    { cat:"infra", title:"Improve Infrastructure: Fuel Breaks" }
+  ];
+  return pool.filter(s => !selectedCats.includes(s.cat)).slice(0,2);
+}
+
+/* ------------------------------
+   State & rendering
+--------------------------------*/
+const state = {
+  address: null,
+  selectedCats: [],     // e.g., ["harden", "defensible"]
+  subSelections: {},    // {harden: Set([...]), defensible: Set([...])}
+};
+
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function renderCategories(){
+  const wrap = $("#categories");
+  wrap.innerHTML = "";
+  CATEGORIES.forEach(cat=>{
+    const card = document.createElement("button");
+    card.className="card-toggle";
+    card.type="button";
+    card.setAttribute("role","button");
+    card.setAttribute("aria-pressed", state.selectedCats.includes(cat.id) ? "true":"false");
+    card.dataset.cat = cat.id;
+    card.innerHTML = `
+      <div class="ico">${cat.icon}</div>
+      <div>
+        <div class="title">${cat.title}</div>
+        <div class="desc">${cat.desc}</div>
+      </div>`;
+    card.addEventListener("click", ()=>toggleCategory(cat.id));
+    wrap.appendChild(card);
+  });
+  renderChips();
+}
+
+function renderChips(){
+  const chipbar = $("#chips");
+  chipbar.innerHTML = state.selectedCats.map(id=>{
+    const cat = CATEGORIES.find(c=>c.id===id);
+    return `<span class="chip">${cat.icon} ${cat.title}</span>`;
+  }).join("");
+  $("#catWarn").style.display = state.selectedCats.length>2 ? "" : "none";
+  // Show accordion when 1-2 selected
+  $("#accordion").style.display = state.selectedCats.length>0 ? "" : "none";
+  if (state.selectedCats.length>0) renderAccordion();
+}
+
+function toggleCategory(id){
+  const i = state.selectedCats.indexOf(id);
+  if (i>=0){ state.selectedCats.splice(i,1); }
+  else{
+    if (state.selectedCats.length>=2){
+      $("#catWarn").style.display = "";
+      return;
+    }
+    state.selectedCats.push(id);
+  }
+  // reset report if changing selection mid-flow
+  $("#report").style.display="none";
+  $("#footerCtas").style.display="none";
+  renderCategories();
+}
+
+function renderAccordion(){
+  const acc = $("#accordion");
+  acc.innerHTML = "";
+  state.selectedCats.forEach((catId, idx)=>{
+    const cat = CATEGORIES.find(c=>c.id===catId);
+    const open = idx===0 ? "true" : "false";
+    const item = document.createElement("div");
+    item.className="acc-item";
+    item.dataset.cat = catId;
+    item.setAttribute("data-open", open);
+
+    // subaction toggles
+    const subs = SUBACTIONS[catId] || [];
+    const subHtml = subs.map(sa=>{
+      const pressed = state.subSelections[catId]?.has(sa.id) ? "true":"false";
+      return `<button type="button" class="sub-toggle" role="button" aria-pressed="${pressed}" data-sub="${sa.id}">
+        <strong>${sa.label}</strong><br><span class="muted">${sa.blurb}</span>
+      </button>`;
+    }).join("");
+
+    item.innerHTML = `
+      <div class="acc-head" role="button" aria-controls="body-${catId}" aria-expanded="${open}">
+        <span>${cat.icon} ${cat.title}</span>
+        <span>▼</span>
+      </div>
+      <div id="body-${catId}" class="acc-body">
+        <div class="subgrid">${subHtml}</div>
+        <div class="acc-actions">
+          <button class="btn small ghost" data-act="skip">Skip</button>
+          <button class="btn small" data-act="continue">Continue</button>
+        </div>
+      </div>
+    `;
+    acc.appendChild(item);
+  });
+
+  // Listeners
+  $$("#accordion .acc-head").forEach(head=>{
+    head.addEventListener("click", ()=>{
+      const item = head.parentElement;
+      const isOpen = item.getAttribute("data-open")==="true";
+      // toggle
+      item.setAttribute("data-open", isOpen?"false":"true");
+    });
+  });
+  $$("#accordion .sub-toggle").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const catId = btn.closest(".acc-item").dataset.cat;
+      const subId = btn.dataset.sub;
+      state.subSelections[catId] ||= new Set();
+      if (btn.getAttribute("aria-pressed")==="true"){
+        btn.setAttribute("aria-pressed","false");
+        state.subSelections[catId].delete(subId);
+      } else {
+        btn.setAttribute("aria-pressed","true");
+        state.subSelections[catId].add(subId);
+      }
+    });
+  });
+  $$("#accordion .acc-actions .btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const action = b.dataset.act;
+      const item = b.closest(".acc-item");
+      const all = $$("#accordion .acc-item");
+      const idx = all.indexOf(item);
+      if (action==="continue" || action==="skip"){
+        // collapse current, open next or show report
+        item.setAttribute("data-open","false");
+        const next = all[idx+1];
+        if (next){ next.setAttribute("data-open","true"); next.scrollIntoView({behavior:"smooth",block:"start"}); }
+        else { generateReport(); document.getElementById("report").scrollIntoView({behavior:"smooth",block:"start"}); }
+      }
+    });
+  });
+}
+
+function generateReport(){
+  const cats = [...state.selectedCats];
+  const subacts = [];
+  cats.forEach(c=>{
+    const ids = [...(state.subSelections[c]||[])];
+    const full = (SUBACTIONS[c]||[]).filter(sa=>ids.includes(sa.id));
+    subacts.push(...full);
+  });
+
+  // Headline
+  const catTitles = cats.map(id=>CATEGORIES.find(c=>c.id===id).title).join(" + ");
+  $("#reportBasedOn").textContent = `Based on your focus: ${catTitles}`;
+
+  // Emergency always present
+  const emergency = mockEmergency();
+  const $elist = $("#emergencyList");
+  $elist.innerHTML = emergency.map(e=>`
+    <div class="item">
+      <strong>${e.name}</strong><br/>
+      ${e.phone?`📞 ${e.phone} &nbsp;`:''}${e.link?`<a href="${e.link}">Website/Alerts →</a>`:''}
+    </div>
+  `).join("");
+
+  // Programs
+  const programs = mockPrograms(cats, subacts);
+  const $plist = $("#assistList");
+  $plist.innerHTML = programs.length ? programs.map(p=>`
+    <div class="item">
+      <strong>💰 ${p.name}</strong><br/>
+      <span class="muted">${p.desc}</span><br/>
+      ${p.tags.map(t=>`<span class="tag">${t}</span>`).join(' ')}
+      <div style="margin-top:6px"><a href="#">Apply / Learn more →</a></div>
+    </div>
+  `).join("") : `<div class="item">No programs right now. Try another focus area.</div>`;
+
+  // Contractors
+  const contr = mockContractors(cats, subacts);
+  const $clist = $("#contractList");
+  if (!contr.length){
+    $clist.innerHTML = `<div class="item">No contractors found nearby — try refining or another focus area.</div>`;
+  } else {
+    const first = contr.slice(0,10);
+    $clist.innerHTML = first.map(c=>`
+      <div class="item">
+        <strong>👷 ${c.name}</strong><br/>
+        Services: ${c.services.map(s=>`<span class="tag">${s}</span>`).join(' ')}<br/>
+        Area: ${c.area} &nbsp; • &nbsp; Status: ${c.status}
+      </div>
+    `).join("");
+    if (contr.length>10){
+      $clist.innerHTML += `
+        <div class="item">
+          We found ${contr.length} contractors near you.
+          <div style="margin-top:6px">
+            <button class="btn small">Filter by Distance</button>
+            <button class="btn small">Filter by Budget</button>
+            <button class="btn small">Filter by Availability</button>
+          </div>
+        </div>`;
+    }
+  }
+
+  // Learn more microcards
+  const micros = microcardsFor(subacts);
+  const $learn = $("#learnList");
+  const extra = micros.map(m=>`
+    <div class="item">
+      <strong>📚 ${m.title}</strong><br/>
+      <em>Why:</em> ${m.why}<br/>
+      <em>How:</em> ${m.how}<br/>
+      <a href="${m.link}">Read full guide →</a>
+    </div>`).join("");
+  // append after the first sprite + CTA already placed
+  $learn.insertAdjacentHTML("afterbegin", extra);
+
+  // Expand suggestions
+  const sugg = suggestExpansions(cats);
+  const $exp = $("#expandList");
+  $exp.innerHTML = sugg.map(s=>`
+    <div class="item">
+      <strong>${s.title}</strong><br/>
+      <button class="btn small" onclick="addExpansion('${s.cat}')">Add to Report →</button>
+    </div>
+  `).join("");
+
+  // Show report + sticky footer
+  $("#report").style.display="";
+  $("#footerCtas").style.display="";
+}
+
+function addExpansion(catId){
+  // Add category (if room) or just add a representative subaction to subSelections
+  if (!state.selectedCats.includes(catId) && state.selectedCats.length<2){
+    state.selectedCats.push(catId);
+    // pick first two subactions as default to demonstrate behavior
+    const subs = (SUBACTIONS[catId]||[]).slice(0,2).map(sa=>sa.id);
+    state.subSelections[catId] = new Set(subs);
+    renderCategories();
+    renderAccordion();
+  }
+  // Regenerate report with new filters
+  generateReport();
+}
+
+/* ------------------------------
+   Initialize
+--------------------------------*/
+function init(){
+  renderCategories();
+  $("#useAddr").addEventListener("click", ()=>{
+    state.address = $("#addr").value || null;
+    alert(state.address ? `Using address: ${state.address}` : "No address provided.");
+  });
+  $("#skipAddr").addEventListener("click", ()=>{
+    state.address = null;
+    alert("Continuing without an address.");
+  });
+}
+init();
+</script>
+</body>
+</html>
