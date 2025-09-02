@@ -158,7 +158,15 @@ h1{font-size:28px; margin:0 0 8px}
       <button class="btn" id="useAddr">Use Address</button>
       <button class="btn secondary" id="skipAddr">Skip</button>
     </div>
-
+<!-- Map preview -->
+<div id="gmap" style="
+  height:300px;
+  margin-top:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  filter:grayscale(1) contrast(1.05);  /* keeps it wireframe */
+  background:var(--surface);
+"></div>
     <div class="section-title">What do you want to focus on today? <span class="muted">(Pick up to two)</span></div>
     <div id="chips" class="chipbar" aria-live="polite"></div>
 
@@ -571,5 +579,78 @@ function init(){
 }
 init();
 </script>
+   <script>
+let gmap, gmarker, geocoder, autocomplete;
+
+function initGMap() {
+  // Base map centered near Southern Oregon; change if you like
+  gmap = new google.maps.Map(document.getElementById('gmap'), {
+    center: { lat: 42.4, lng: -123.3 },
+    zoom: 9,
+    mapTypeControl: false,
+    streetViewControl: false,
+  });
+
+  geocoder = new google.maps.Geocoder();
+
+  const addrInput = document.getElementById('addr');
+  if (addrInput) {
+    // Places Autocomplete on your address input
+    autocomplete = new google.maps.places.Autocomplete(addrInput, {
+      fields: ['geometry', 'formatted_address'],
+      types: ['geocode'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry || !place.geometry.location) return;
+      const loc = place.geometry.location;
+      showGoogleMarker(loc.lat(), loc.lng(), place.formatted_address);
+      // keep your state in sync if present
+      if (window.state) state.address = place.formatted_address;
+    });
+  }
+
+  // Wire up your existing buttons
+  document.getElementById('useAddr')?.addEventListener('click', () => {
+    const addr = document.getElementById('addr')?.value?.trim();
+    if (!addr) { alert('Please enter an address.'); return; }
+    geocoder.geocode({ address: addr }, (results, status) => {
+      if (status !== 'OK' || !results?.length) {
+        alert('Address not found. Try a more specific address.');
+        return;
+      }
+      const r = results[0];
+      const loc = r.geometry.location;
+      showGoogleMarker(loc.lat(), loc.lng(), r.formatted_address);
+      if (window.state) state.address = r.formatted_address;
+    });
+  });
+
+  document.getElementById('skipAddr')?.addEventListener('click', () => {
+    gmap.setCenter({ lat: 42.4, lng: -123.3 });
+    gmap.setZoom(9);
+    if (gmarker) { gmarker.setMap(null); gmarker = null; }
+    if (window.state) state.address = null;
+  });
+}
+
+function showGoogleMarker(lat, lng, title) {
+  const pos = { lat, lng };
+  if (!gmarker) {
+    gmarker = new google.maps.Marker({ position: pos, map: gmap, title });
+  } else {
+    gmarker.setPosition(pos);
+    gmarker.setTitle(title);
+  }
+  gmap.setCenter(pos);
+  gmap.setZoom(15);
+}
+</script>
+
+<!-- Load Google Maps JS: replace AIzaSyByDbhJBYGR51Az_uDMhIn0J7AoXYbW5cs -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByDbhJBYGR51Az_uDMhIn0J7AoXYbW5cs&libraries=places&callback=initGMap">
+</script>
+
 </body>
 </html>
