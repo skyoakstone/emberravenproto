@@ -4,102 +4,143 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>Ember Raven – Your Personal Resource Navigator</title>
+
 <style>
+/* ===========================
+   WIREFRAME GRAYSCALE THEME
+   =========================== */
+
+/* Neutral palette tokens */
 :root{
-  --bg:#999999;           /* light background */
-  --card:#ffffff;         /* white cards */
-  --muted:#475569;        /* slate-600 */
-  --text:#4d5f88;         /* near-black text */
-  --accent:#16a34a;       /* green-600 */
-  --accent-2:#0369a1;     /* sky-700 (links) */
-  --accent-3:#b45309;     /* amber-700 */
-  --danger:#dc2626;       /* red-600 */
-  --chip:#f1f5f9;         /* slate-100 */
-  --border:#e5e7eb;       /* gray-200 */
+  --bg:#ffffff;          /* page background */
+  --card:#ffffff;        /* card/surface background */
+  --text:#111111;        /* primary text (near-black) */
+  --muted:#666666;       /* secondary text */
+  --border:#d9d9d9;      /* dividers & outlines */
+  --surface:#f6f6f6;     /* subtle panels / section bg */
+
+  /* Keep these for component states, but grayscale */
+  --accent:#111111;      /* used for outlines/primary CTA bg */
+  --accent-2:#111111;    /* link color (will be underlined) */
+  --accent-3:#333333;    /* spare neutral accent */
+  --danger:#333333;      /* neutralized “danger” */
+  --chip:#f3f3f3;        /* chip bg */
 }
 
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--text); font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Roboto,Roboto;
-  }
-  a{color:var(--accent-2); text-decoration:none}
-  header, .container{max-width:980px; margin:0 auto; padding:16px}
-  header{
-    display:flex; align-items:center; gap:12px; justify-content:space-between; border-bottom:1px solid var(--border);
-  }
-  .logo{display:flex; align-items:center; gap:8px; font-weight:700}
-  .logo .icon{font-size:24px}
-  .nav{display:flex; gap:16px; font-size:14px; color:#cbd5e1}
-  .hero{padding:24px 16px}
-  h1{font-size:28px; margin:0 0 8px}
-  .sub{color:#484c51; margin-bottom:16px}
-  .address{
-    display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:20px;
-  }
-  .input{
-    background:#0b1220; border:1px solid var(--border); color:var(--text);
-    padding:12px 14px; border-radius:10px; min-width:260px; flex:1;
-  }
-  .btn{
-    background:var(--accent); color:#032414; border:0; padding:12px 16px; border-radius:10px;
-    font-weight:700; cursor:pointer;
-  }
-  .btn.secondary{background:#0b1220; color:#cbd5e1; border:1px solid var(--border)}
-  .grid{
-    display:grid; gap:12px; grid-template-columns:repeat(1, minmax(0,1fr));
-  }
-  @media (min-width:640px){ .grid{grid-template-columns:repeat(2,1fr)} }
-  @media (min-width:900px){ .grid{grid-template-columns:repeat(3,1fr)} }
-  .card-toggle{
-    background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;
-    display:flex; gap:12px; align-items:flex-start; position:relative; transition:transform .05s ease;
-  }
-  .card-toggle:active{transform:scale(.99)}
-  .card-toggle[aria-pressed="true"]{ outline:2px solid var(--accent); }
-  .card-toggle .ico{font-size:22px; margin-top:2px}
-  .card-toggle .title{font-weight:700; margin-bottom:4px}
-  .card-toggle .desc{color:#cbd5e1; font-size:14px}
-  .chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 6px}
-  .chip{background:var(--chip); border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:13px}
-  .warn{color:#fca5a5; font-size:13px}
-  .section-title{margin:18px 0 8px; font-size:18px; font-weight:800}
-  .divider{height:1px; background:var(--border); margin:14px 0}
-  /* Accordion */
-  .accordion{margin:18px 0}
-  .acc-item{border:1px solid var(--border); border-radius:14px; margin-bottom:12px; overflow:hidden; background:var(--card)}
-  .acc-head{
-    display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; font-weight:700;
-  }
-  .acc-body{display:none; padding:10px 12px 14px}
-  .acc-item[data-open="true"] .acc-body{display:block}
-  .subgrid{display:grid; gap:10px; grid-template-columns:repeat(1, minmax(0,1fr))}
-  @media (min-width:640px){ .subgrid{grid-template-columns:repeat(2,1fr)} }
-  .sub-toggle{
-    display:block; width:100%; text-align:left; padding:12px; border-radius:12px; border:1px solid var(--border);
-    background:#0b1220; color:var(--text); cursor:pointer;
-  }
-  .sub-toggle[aria-pressed="true"]{background:#0f1a30; outline:2px solid var(--accent-2)}
-  .acc-actions{display:flex; justify-content:flex-end; gap:8px; padding:10px 0 0}
-  .btn.small{padding:10px 12px; font-size:14px; border-radius:10px}
-  .btn.ghost{background:transparent; color:#cbd5e1; border:1px solid var(--border)}
-  /* Report */
-  .report{margin:22px 0 100px}
-  .panel{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; background:var(--card)}
-  .panel h3{margin:0; padding:14px 16px; background:#0b1220; border-bottom:1px solid var(--border); font-size:16px}
-  .panel .content{padding:12px}
-  .list{display:grid; gap:10px}
-  .item{border:1px solid var(--border); border-radius:12px; padding:10px; background:#0b1220}
-  .tag{display:inline-block; padding:2px 8px; border-radius:999px; background:#0f1a30; border:1px solid var(--border); font-size:12px; color:#cbd5e1}
-  .sprite{display:flex; gap:10px; align-items:flex-start}
-  .sticky-footer{
-    position:fixed; left:0; right:0; bottom:0; background:#0b1220; border-top:1px solid var(--border);
-    padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
-  }
-  .footer-cta{background:#111827; border:1px solid var(--border); color:#e5e7eb; padding:10px 14px; border-radius:10px; cursor:pointer}
-  .footer-cta.primary{background:var(--accent); color:#032414; border:0}
-  .muted{color:#cbd5e1}
+/* Base layout/typography */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Roboto,Roboto;
+}
+a{
+  color:var(--text);
+  text-decoration:underline; /* keep affordance in monochrome */
+}
+
+/* Containers */
+header, .container{max-width:980px; margin:0 auto; padding:16px}
+header{
+  display:flex; align-items:center; gap:12px; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex; align-items:center; gap:8px; font-weight:700}
+.logo .icon{font-size:24px}
+.nav{display:flex; gap:16px; font-size:14px; color:var(--muted)}
+.hero{padding:24px 16px}
+
+/* Headings/text */
+h1{font-size:28px; margin:0 0 8px}
+.sub{color:var(--muted); margin-bottom:16px}
+
+/* Address block */
+.address{
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:20px;
+}
+.input{
+  background:#fff; border:1px solid var(--border); color:var(--text);
+  padding:12px 14px; border-radius:10px; min-width:260px; flex:1;
+}
+
+/* Buttons */
+.btn{
+  background:#eaeaea; color:var(--text); border:1px solid var(--border);
+  padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer;
+}
+.btn.secondary{background:#fff; color:var(--text); border:1px solid var(--border)}
+.btn.small{padding:10px 12px; font-size:14px; border-radius:10px}
+.btn.ghost{background:transparent; color:var(--text); border:1px solid var(--border)}
+.btn:hover{filter:brightness(.97)}
+
+/* Grid & cards */
+.grid{
+  display:grid; gap:12px; grid-template-columns:repeat(1, minmax(0,1fr));
+}
+@media (min-width:640px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:900px){ .grid{grid-template-columns:repeat(3,1fr)} }
+
+.card-toggle{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;
+  display:flex; gap:12px; align-items:flex-start; position:relative; transition:transform .05s ease;
+}
+.card-toggle:active{transform:scale(.99)}
+.card-toggle[aria-pressed="true"]{ outline:2px solid var(--accent); }
+.card-toggle .ico{font-size:22px; margin-top:2px}
+.card-toggle .title{font-weight:700; margin-bottom:4px}
+.card-toggle .desc{color:var(--muted); font-size:14px}
+
+/* Chips / meta text */
+.chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 6px}
+.chip{background:var(--chip); border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:13px}
+.warn{color:var(--muted); font-size:13px}
+.section-title{margin:18px 0 8px; font-size:18px; font-weight:800}
+.divider{height:1px; background:var(--border); margin:14px 0}
+.muted{color:var(--muted)}
+
+/* Accordion */
+.accordion{margin:18px 0}
+.acc-item{border:1px solid var(--border); border-radius:14px; margin-bottom:12px; overflow:hidden; background:var(--card)}
+.acc-head{
+  display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; font-weight:700;
+  background:var(--surface);
+}
+.acc-body{display:none; padding:10px 12px 14px}
+.acc-item[data-open="true"] .acc-body{display:block}
+.subgrid{display:grid; gap:10px; grid-template-columns:repeat(1, minmax(0,1fr))}
+@media (min-width:640px){ .subgrid{grid-template-columns:repeat(2,1fr)} }
+
+.sub-toggle{
+  display:block; width:100%; text-align:left; padding:12px; border-radius:12px; border:1px solid var(--border);
+  background:#fff; color:var(--text); cursor:pointer;
+}
+.sub-toggle[aria-pressed="true"]{background:#f0f0f0; outline:2px solid #333}
+
+/* Report panels & lists */
+.report{margin:22px 0 100px}
+.panel{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; background:var(--card)}
+.panel h3{
+  margin:0; padding:14px 16px; background:var(--surface);
+  border-bottom:1px solid var(--border); font-size:16px
+}
+.panel .content{padding:12px}
+.list{display:grid; gap:10px}
+.item{border:1px solid var(--border); border-radius:12px; padding:10px; background:#fff}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  background:#f3f3f3; border:1px solid var(--border); font-size:12px; color:var(--muted)
+}
+.sprite{display:flex; gap:10px; align-items:flex-start}
+
+/* Sticky footer CTAs */
+.sticky-footer{
+  position:fixed; left:0; right:0; bottom:0; background:#f9f9f9; border-top:1px solid var(--border);
+  padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+}
+.footer-cta{background:#f0f0f0; border:1px solid var(--border); color:#111; padding:10px 14px; border-radius:10px; cursor:pointer}
+.footer-cta.primary{background:var(--accent); color:#fff; border:1px solid var(--accent)}
 </style>
 </head>
+
 <body>
   <header>
     <div class="logo"><span class="icon">🔥</span> Wildfire Preparedness</div>
@@ -141,25 +182,19 @@
       <!-- Emergency -->
       <div class="panel" id="emergencyPanel">
         <h3>Emergency Contacts & Alerts</h3>
-        <div class="content list" id="emergencyList">
-          <!-- Emergency items injected -->
-        </div>
+        <div class="content list" id="emergencyList"></div>
       </div>
 
       <!-- Programs -->
       <div class="panel" id="assistPanel">
         <h3>Find Assistance</h3>
-        <div class="content list" id="assistList">
-          <!-- Program cards injected -->
-        </div>
+        <div class="content list" id="assistList"></div>
       </div>
 
       <!-- Contractors -->
       <div class="panel" id="contractPanel">
         <h3>Find Contractors</h3>
-        <div class="content list" id="contractList">
-          <!-- Contractor cards injected -->
-        </div>
+        <div class="content list" id="contractList"></div>
       </div>
 
       <!-- Learn More -->
@@ -170,7 +205,6 @@
             <div>✨</div>
             <div><strong>Did you know?</strong><br/>60% of homes ignite from embers, not direct flames.</div>
           </div>
-          <!-- Microcards injected -->
           <div class="item"><a href="#" class="muted">Explore all educational resources →</a></div>
         </div>
       </div>
@@ -178,9 +212,7 @@
       <!-- Expand report -->
       <div class="panel">
         <h3>➕ Want to expand your report?</h3>
-        <div class="content list" id="expandList">
-          <!-- Suggestion tiles injected -->
-        </div>
+        <div class="content list" id="expandList"></div>
       </div>
     </div>
   </div>
@@ -257,7 +289,8 @@ const SUBACTIONS = {
   ]
 };
 
-// Simple placeholder “database” returns:
+/* (JS unchanged below this line) */
+
 function mockEmergency() {
   return [
     { name:"Fire District", phone:"(555) 123-4567", link:"https://alerts.example.org" },
@@ -281,7 +314,6 @@ function mockContractors(selectedCats, subacts) {
     { name:"ShieldScape", services:["Clear 0–5 ft Zone","Hardscaping","Fences & Decks Near House"], area:"Applegate", status:"Community Verified" },
     { name:"LandCare Fuels", services:["Thinning & Fuels Reduction","Biomass Cleanup & Removal"], area:"South County", status:"Verified Aug 2025" },
   ];
-  // naive filter: include if any subaction label appears
   return base.filter(c => c.services.some(s => subacts.some(sa => s.includes(sa.label))));
 }
 function microcardsFor(subacts){
@@ -306,12 +338,7 @@ function suggestExpansions(selectedCats){
 /* ------------------------------
    State & rendering
 --------------------------------*/
-const state = {
-  address: null,
-  selectedCats: [],     // e.g., ["harden", "defensible"]
-  subSelections: {},    // {harden: Set([...]), defensible: Set([...])}
-};
-
+const state = { address:null, selectedCats:[], subSelections:{} };
 const $ = sel => document.querySelector(sel);
 const $$ = sel => Array.from(document.querySelectorAll(sel));
 
@@ -344,7 +371,6 @@ function renderChips(){
     return `<span class="chip">${cat.icon} ${cat.title}</span>`;
   }).join("");
   $("#catWarn").style.display = state.selectedCats.length>2 ? "" : "none";
-  // Show accordion when 1-2 selected
   $("#accordion").style.display = state.selectedCats.length>0 ? "" : "none";
   if (state.selectedCats.length>0) renderAccordion();
 }
@@ -359,7 +385,6 @@ function toggleCategory(id){
     }
     state.selectedCats.push(id);
   }
-  // reset report if changing selection mid-flow
   $("#report").style.display="none";
   $("#footerCtas").style.display="none";
   renderCategories();
@@ -376,7 +401,6 @@ function renderAccordion(){
     item.dataset.cat = catId;
     item.setAttribute("data-open", open);
 
-    // subaction toggles
     const subs = SUBACTIONS[catId] || [];
     const subHtml = subs.map(sa=>{
       const pressed = state.subSelections[catId]?.has(sa.id) ? "true":"false";
@@ -401,12 +425,10 @@ function renderAccordion(){
     acc.appendChild(item);
   });
 
-  // Listeners
   $$("#accordion .acc-head").forEach(head=>{
     head.addEventListener("click", ()=>{
       const item = head.parentElement;
       const isOpen = item.getAttribute("data-open")==="true";
-      // toggle
       item.setAttribute("data-open", isOpen?"false":"true");
     });
   });
@@ -431,7 +453,6 @@ function renderAccordion(){
       const all = $$("#accordion .acc-item");
       const idx = all.indexOf(item);
       if (action==="continue" || action==="skip"){
-        // collapse current, open next or show report
         item.setAttribute("data-open","false");
         const next = all[idx+1];
         if (next){ next.setAttribute("data-open","true"); next.scrollIntoView({behavior:"smooth",block:"start"}); }
@@ -450,11 +471,9 @@ function generateReport(){
     subacts.push(...full);
   });
 
-  // Headline
   const catTitles = cats.map(id=>CATEGORIES.find(c=>c.id===id).title).join(" + ");
   $("#reportBasedOn").textContent = `Based on your focus: ${catTitles}`;
 
-  // Emergency always present
   const emergency = mockEmergency();
   const $elist = $("#emergencyList");
   $elist.innerHTML = emergency.map(e=>`
@@ -464,7 +483,6 @@ function generateReport(){
     </div>
   `).join("");
 
-  // Programs
   const programs = mockPrograms(cats, subacts);
   const $plist = $("#assistList");
   $plist.innerHTML = programs.length ? programs.map(p=>`
@@ -476,7 +494,6 @@ function generateReport(){
     </div>
   `).join("") : `<div class="item">No programs right now. Try another focus area.</div>`;
 
-  // Contractors
   const contr = mockContractors(cats, subacts);
   const $clist = $("#contractList");
   if (!contr.length){
@@ -503,7 +520,6 @@ function generateReport(){
     }
   }
 
-  // Learn more microcards
   const micros = microcardsFor(subacts);
   const $learn = $("#learnList");
   const extra = micros.map(m=>`
@@ -513,10 +529,8 @@ function generateReport(){
       <em>How:</em> ${m.how}<br/>
       <a href="${m.link}">Read full guide →</a>
     </div>`).join("");
-  // append after the first sprite + CTA already placed
   $learn.insertAdjacentHTML("afterbegin", extra);
 
-  // Expand suggestions
   const sugg = suggestExpansions(cats);
   const $exp = $("#expandList");
   $exp.innerHTML = sugg.map(s=>`
@@ -526,22 +540,18 @@ function generateReport(){
     </div>
   `).join("");
 
-  // Show report + sticky footer
   $("#report").style.display="";
   $("#footerCtas").style.display="";
 }
 
 function addExpansion(catId){
-  // Add category (if room) or just add a representative subaction to subSelections
   if (!state.selectedCats.includes(catId) && state.selectedCats.length<2){
     state.selectedCats.push(catId);
-    // pick first two subactions as default to demonstrate behavior
     const subs = (SUBACTIONS[catId]||[]).slice(0,2).map(sa=>sa.id);
     state.subSelections[catId] = new Set(subs);
     renderCategories();
     renderAccordion();
   }
-  // Regenerate report with new filters
   generateReport();
 }
 
