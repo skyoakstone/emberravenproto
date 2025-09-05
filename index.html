@@ -155,7 +155,7 @@ h1{font-size:28px; margin:0 0 8px}
 
     <div class="address">
       <input class="input" id="addr" placeholder="Enter address (optional)" />
-      <button class="btn" id="useAddr">Use Address</button>
+      <button class="btn" id="useAddr">Confirm Address</button>
       <button class="btn secondary" id="skipAddr">Skip</button>
     </div>
 <!-- Map preview -->
@@ -579,10 +579,16 @@ function addExpansion(catId){
 --------------------------------*/
 function init(){
   renderCategories();
-  $("#useAddr").addEventListener("click", ()=>{
-    state.address = $("#addr").value || null;
-    alert(state.address ? `Using address: ${state.address}` : "No address provided.");
-  });
+document.getElementById("confirmAddr").addEventListener("click", () => {
+  const addr = document.getElementById("addr")?.value?.trim();
+  if (addr) {
+    state.address = addr;
+    alert(`Address confirmed: ${addr}`);
+  } else {
+    alert("Please enter an address first.");
+  }
+});
+
   $("#skipAddr").addEventListener("click", ()=>{
     state.address = null;
     alert("Continuing without an address.");
