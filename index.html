@@ -239,62 +239,77 @@ h1{font-size:28px; margin:0 0 8px}
    Replace with Airtable/Softr data sources later
 --------------------------------*/
 const CATEGORIES = [
-  { id:"prepare", icon:"🧭", title:"Plan for Wildfire ", desc:"Plans, insurance, pets, go-bags" },
-  { id:"harden", icon:"🏠", title:"Harden Your Home", desc:"Roof, gutters, vents, windows" },
-  { id:"defensible", icon:"🛡️", title:"Create Defensible Space (0-30 Feet) (0-30 Feet) (0-30 Feet)", desc:"Near-home landscaping & hardscape" },
-  { id:"treat", icon:"🌲", title:"Treat Your Forest (+30 Feet)", desc:"Thinning, biomass cleanup, restoration" },
-  { id:"infra", icon:"🚰", title:"Improve Infrastructure", desc:"Fuel breaks, roads, irrigation" },
-  { id:"neighbors", icon:"👥", title:"Prepare with Neighbors", desc:"Firewise, phone trees, mapping" },
+  { id:"plan",       icon:"🧭", title:"Plan for Wildfire",                     desc:"people, pets, insurance, alerts, livestock" },
+  { id:"harden",     icon:"🏠", title:"Harden Your Home",                      desc:"roofs, windows, siding, gutters, vents" },
+  { id:"defensible", icon:"🛡️", title:"Create Defensible Space (0–30 ft)",    desc:"Zone 0–5, 5–30, hardscape" },
+  { id:"forest",     icon:"🌲", title:"Treat Your Forest (+30 ft)",            desc:"Biochar, fuels, forest mgmt" },
+  { id:"infra",      icon:"🛠️", title:"Improve Your Infrastructure",          desc:"Roads, water, swales, driveway" },
+  { id:"neighbors",  icon:"👥", title:"Prepare with Neighbors",                desc:"Firewise, phone trees, mapping" },
 ];
 
 const SUBACTIONS = {
+  plan: [
+    { id:"doc-belongings",   label:"Document Your Belongings", blurb:"Photos, serial numbers, inventory." },
+    { id:"get-notified",     label:"Get Notified when Wildfire is Near", blurb:"Sign up, configure local alerts." },
+    { id:"evac-plan",        label:"Make Your Evacuation Plan", blurb:"Routes, reunification, practice." },
+    { id:"know-responders",  label:"Know Your Responders", blurb:"Fire district, sheriff, emergency contacts." },
+    { id:"go-bag",           label:"Assemble Your Go-Bag", blurb:"Essentials for 72 hours." },
+    { id:"insurance",        label:"Confirm Your Insurance Coverage", blurb:"Coverage, endorsements, photos." },
+    { id:"livestock-plan",   label:"Make a Plan for Livestock", blurb:"Transport, shelter, feed." },
+    { id:"pets-plan",        label:"Make a Plan for Pets", blurb:"Crates, meds, tags, contacts." },
+    { id:"safeguard-docs",   label:"Safeguard Critical Documents", blurb:"Backups, fire safe, cloud." },
+    { id:"smoke-prep",       label:"Prepare for Smoke in the Air", blurb:"Masks, filters, clean room." },
+    { id:"home-assess",      label:"Assess Your Home for Wildfire Risk", blurb:"DIY checklist or pro assessment." },
+  ],
+
   harden: [
-    { id:"roof", label:"Roof Cleaning", blurb:"Clear debris to reduce embers." },
-    { id:"gutters", label:"Gutter Cleaning", blurb:"Remove leaves & needles." },
-    { id:"vents", label:"Vent Replacement", blurb:"Install ember mesh to block sparks." },
-    { id:"windows", label:"Windows & Siding", blurb:"Upgrade weak points." },
-    { id:"decks", label:"Attached Decks & Fences", blurb:"Avoid ember 'fuses' to the house." },
-    { id:"assessment", label:"Home Fire Risk Assessment", blurb:"DIY or professional check-up." },
+    { id:"upgrade-doors-windows", label:"Upgrade Doors and Windows", blurb:"Tempered glass, solid doors, seals." },
+    { id:"upgrade-siding",        label:"Upgrade Siding", blurb:"Ignition-resistant materials, repairs." },
+    { id:"replace-vents",         label:"Replace Vents with Metal Mesh", blurb:"≤ 1/8\" mesh to block embers." },
+    { id:"clean-gutters",         label:"Clean Your Gutters", blurb:"Remove needles/leaves regularly." },
+    { id:"safe-way-in-out",       label:"Make a Safe Way In & Out", blurb:"Clear access around entries/exits." },
+    { id:"clean-roof",            label:"Clean Your Roof", blurb:"Clear debris from roof and valleys." },
   ],
+
   defensible: [
-    { id:"zone0", label:"Clear 0–5 ft Zone", blurb:"Create an ignition buffer." },
-    { id:"plants", label:"Firesafe Landscaping", blurb:"Spacing & plant choices." },
-    { id:"hardscape", label:"Hardscaping", blurb:"Stone borders, gravel, patios." },
-    { id:"nearTrees", label:"Trim Trees Near Home", blurb:"Remove ladder fuels." },
-    { id:"fencesNear", label:"Fences & Decks Near House", blurb:"Break ember pathways." },
-    { id:"smallWater", label:"Small-Scale Watering", blurb:"Irrigate defensible space." },
+    { id:"zone0",                 label:"Clear 0–5 Foot Zone Around House", blurb:"Non-combustible buffer at the wall." },
+    { id:"zone1-landscape",       label:"Create 5–30 Foot Firesafe Landscape", blurb:"Spacing, pruning, reduce fuels." },
+    { id:"add-hardscape",         label:"Add Hardscape around Your Home (Rock, Stone, Gravel)", blurb:"Paths, borders, patios." },
+    { id:"prune-remove-trees",    label:"Prune and Remove Trees", blurb:"Eliminate ladder fuels near home." },
+    { id:"restore-natives",       label:"Restore Native Species", blurb:"Resilient, site-appropriate plants." },
+    { id:"fire-resistant-plants", label:"Find Fire-Reluctant Plants", blurb:"Plant lists, placement guidance." },
+    { id:"rainwater-rooftop",     label:"Harvest Your Rainwater for Rooftop Sprinklers", blurb:"Tanks, pumps, rooftop lines." },
+    { id:"decks-fencing",         label:"Upgrade or Remove Decks and Fencing", blurb:"Break ember pathways." },
+    { id:"irrigate-defensible",   label:"Irrigate your Defensible Space", blurb:"Keep plants hydrated and maintained." },
   ],
-  prepare: [
-    { id:"gobag", label:"Go Bags / Kits", blurb:"Essentials ready to go." },
-    { id:"evac", label:"Evacuation Planning", blurb:"Routes & reunification." },
-    { id:"ins", label:"Insurance & Docs Prep", blurb:"Coverage, belongings, critical docs." },
-    { id:"alerts", label:"Emergency Alerts & Apps", blurb:"Sign up & configure." },
-    { id:"pets", label:"Pets & Livestock", blurb:"Plan for animals." },
-    { id:"smoke", label:"Smoke Preparedness", blurb:"Masks, air purifiers, safe room." },
+
+  forest: [
+    { id:"learn-biochar",         label:"Learn About Biochar", blurb:"Benefits, production, soil integration." },
+    { id:"remove-wood-debris",    label:"Remove & Cleanup Wood Debris", blurb:"Slash, piles, disposal/utilization." },
+    { id:"forest-plan",           label:"Make a Forest Management Plan", blurb:"Goals, schedule, prescriptions." },
+    { id:"fuel-breaks",           label:"Create Fuel Breaks", blurb:"Strategic linear reductions." },
+    { id:"itek",                  label:"Integrate Indigenous Traditional Ecological Knowledge (ITEK)", blurb:"TEC-aligned practices." },
+    { id:"introduce-healthy-fire",label:"Introduce Healthy Fire To Your Forest", blurb:"Rx fire with qualified experts." },
+    { id:"restore-waterways",     label:"Restore Your Waterways", blurb:"Stabilize banks, protect riparian zones." },
+    { id:"sustain-logging",       label:"Harvest Your Timber Sustainably", blurb:"Low-impact, compliance, markets." },
+    { id:"reduce-flammable-fuels",label:"Reduce Flammable Fuels on Your Land", blurb:"Thinning, mastication, removal." },
   ],
-  treat: [
-    { id:"thin", label:"Thinning & Fuels Reduction", blurb:"Reduce fuel continuity." },
-    { id:"biomass", label:"Biomass Cleanup & Removal", blurb:"Dispose or utilize safely." },
-    { id:"arborist", label:"Arborist / Tree Removal", blurb:"Larger trees, hazard limbs." },
-    { id:"forest", label:"Forest Management", blurb:"Long-term stewardship." },
-    { id:"rx", label:"Prescribed Fire (Pro)", blurb:"Expert-guided burning." },
-    { id:"native", label:"Native Plant Restoration", blurb:"Resilient plant communities." },
-  ],
+
   infra: [
-    { id:"breaks", label:"Fuel Breaks", blurb:"Strategic breaks on property." },
-    { id:"ingress", label:"Ingress/Egress Planning", blurb:"Road access & safety." },
-    { id:"roads", label:"Rural Road Work", blurb:"Roadside clearance." },
-    { id:"irrig", label:"Irrigation Systems", blurb:"Property-scale water." },
-    { id:"harvest", label:"Rainwater Harvesting", blurb:"Tanks/ponds for fire use." },
-    { id:"erosion", label:"Flooding & Erosion", blurb:"Stabilize vulnerable areas." },
+    { id:"manage-water-flow",     label:"Manage Your Water Flow", blurb:"Drainage, culverts, conveyance." },
+    { id:"move-earth",            label:"Move Some Earth", blurb:"Regrade, berms, cut/fill for protection." },
+    { id:"create-bioswales",      label:"Create Bio Swales", blurb:"Slow, spread, sink runoff." },
+    { id:"improve-driveway",      label:"Improve your Driveway", blurb:"Surface, width, turnouts." },
+    { id:"build-access-road",     label:"Build an Access Road", blurb:"Spec for emergency vehicle access." },
   ],
+
   neighbors: [
-    { id:"firewise", label:"Firewise Community", blurb:"Start or join a group." },
-    { id:"liaisons", label:"Community Liaisons", blurb:"Point people & info flow." },
-    { id:"phone", label:"Phone Trees", blurb:"Fast neighbor alerts." },
-    { id:"mapping", label:"Risk & Resource Mapping", blurb:"Shared situational awareness." },
-    { id:"vol", label:"Volunteering", blurb:"Local orgs & events." },
-  ]
+    { id:"community-liaisons",    label:"Organize a Community Liaisons Program", blurb:"Points-of-contact & info flow." },
+    { id:"phone-tree",            label:"Organize a Neighborhood Phone Tree", blurb:"Rapid neighbor alerts." },
+    { id:"map-risks",             label:"Map Your Community Risks & Resources", blurb:"Shared situational awareness." },
+    { id:"volunteer",             label:"Find Ways to Volunteer", blurb:"Local orgs and work days." },
+    { id:"firewise",              label:"Start or Join a Firewise USA © Community", blurb:"Collective mitigation & education." },
+  ],
 };
 
 /* (JS unchanged below this line) */
