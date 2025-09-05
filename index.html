@@ -579,12 +579,15 @@ function addExpansion(catId){
 --------------------------------*/
 function init(){
   renderCategories();
-document.getElementById('confirmAddr')?.addEventListener('click', () => {
-  const addr = document.getElementById('addr')?.value?.trim();
-  if (!addr) { alert('Please enter an address or use autocomplete.'); return; }
-  state.address = addr;
-  alert(`Address confirmed: ${addr}`);
+document.getElementById('confirmAddr')?.addEventListener('click', (e) => {
+  const btn = e.target;
+  if (btn.textContent === "Confirm Address") {
+    btn.textContent = "✅ Address Confirmed";
+    btn.disabled = true; // optional: prevents clicking again
+    state.address = document.getElementById("addr")?.value?.trim() || "No address entered";
+  }
 });
+
 
   $("#skipAddr").addEventListener("click", ()=>{
     state.address = null;
