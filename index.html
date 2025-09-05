@@ -167,7 +167,7 @@ h1{font-size:28px; margin:0 0 8px}
   filter:grayscale(1) contrast(1.05);  /* keeps it wireframe */
   background:var(--surface);
 "></div>
-    <div class="section-title">What do you want to focus on today? <span class="muted">(Pick up to two)</span></div>
+    <div class="section-title">What do you want to focus on today? <span class="muted">(Pick any)</span></div>
     <div id="chips" class="chipbar" aria-live="polite"></div>
 
     <!-- STEP 1: Categories -->
@@ -175,7 +175,7 @@ h1{font-size:28px; margin:0 0 8px}
       <!-- Cards injected by JS -->
     </div>
 
-    <p id="catWarn" class="warn" style="display:none">You can select up to two focus areas.</p>
+    <p id="catWarn" class="warn" style="display:none"></p>
 
     <!-- STEP 2: Accordion Wizard (hidden until categories picked) -->
     <div id="accordion" class="accordion" style="display:none" aria-label="Sub-actions wizard">
@@ -242,8 +242,8 @@ const CATEGORIES = [
   { id:"plan",       icon:"🧭", title:"Plan for Wildfire",                     desc:"people, pets, insurance, alerts, livestock" },
   { id:"harden",     icon:"🏠", title:"Harden Your Home",                      desc:"roofs, windows, siding, gutters, vents" },
   { id:"defensible", icon:"🛡️", title:"Create Defensible Space (0–30 ft)",    desc:"Zone 0–5, 5–30, hardscape" },
-  { id:"forest",     icon:"🌲", title:"Treat Your Forest (+30 ft)",            desc:"Biochar, fuels, forest mgmt" },
-  { id:"infra",      icon:"🛠️", title:"Improve Your Infrastructure",          desc:"Roads, water, swales, driveway" },
+  { id:"forest",     icon:"🌲", title:"Treat Your Forest (+30 ft)",            desc:"biochar, prescribed fire, forest mgmt" },
+  { id:"infra",      icon:"🛠️", title:"Improve Your Infrastructure",          desc:"roads, erosion control, swales, driveway" },
   { id:"neighbors",  icon:"👥", title:"Prepare with Neighbors",                desc:"Firewise, phone trees, mapping" },
 ];
 
@@ -325,19 +325,19 @@ function mockPrograms(selectedCats, subacts) {
   const base = [
     { name:"Defensible Space Rebate", desc:"Cost-share for near-home clearing.", tags:["Deadline Sept 30","Verified Aug 2025"], match:["defensible"] },
     { name:"Home Hardening Grant", desc:"Offsets vent/window upgrades.", tags:["Open Now","Verified Aug 2025"], match:["harden"] },
-    { name:"Forest Thinning Cost-Share", desc:"Per-acre support for fuels reduction.", tags:["Waitlist","Verified Aug 2025"], match:["treat"] },
+    { name:"Forest Thinning Cost-Share", desc:"Per-acre support for fuels reduction.", tags:["Waitlist","Verified Aug 2025"], match:["forest"] },
     { name:"Community Mini-Grant", desc:"Neighborhood Firewise projects.", tags:["Quarterly","Verified Aug 2025"], match:["neighbors"] },
   ];
   return base.filter(p => p.match.some(m => selectedCats.includes(m)));
 }
 function mockContractors(selectedCats, subacts) {
   const base = [
-    { name:"Evergreen Arborists", services:["Trim Trees Near Home","Arborist / Tree Removal"], area:"Jackson/Josephine", status:"Verified Aug 2025" },
-    { name:"SparkSafe Roofing", services:["Roof Cleaning","Gutter Cleaning","Vent Replacement"], area:"Rogue Valley", status:"Insured" },
-    { name:"ShieldScape", services:["Clear 0–5 ft Zone","Hardscaping","Fences & Decks Near House"], area:"Applegate", status:"Community Verified" },
-    { name:"LandCare Fuels", services:["Thinning & Fuels Reduction","Biomass Cleanup & Removal"], area:"South County", status:"Verified Aug 2025" },
+    { name:"Evergreen Arborists", services:["Prune and Remove Trees","Arborist / Tree Removal"], area:"Jackson/Josephine", status:"Verified Aug 2025" },
+    { name:"SparkSafe Roofing", services:["Clean Your Roof","Clean Your Gutters","Replace Vents with Metal Mesh"], area:"Rogue Valley", status:"Insured" },
+    { name:"ShieldScape", services:["Clear 0–5 Foot Zone Around House","Add Hardscape around Your Home (Rock, Stone, Gravel)","Upgrade or Remove Decks and Fencing"], area:"Applegate", status:"Community Verified" },
+    { name:"LandCare Fuels", services:["Reduce Flammable Fuels on Your Land","Remove & Cleanup Wood Debris"], area:"South County", status:"Verified Aug 2025" },
   ];
-  return base.filter(c => c.services.some(s => subacts.some(sa => s.includes(sa.label))));
+  return base.filter(c => c.services.some(s => subacts.some(sa => s.label && s.includes(sa.label))));
 }
 function microcardsFor(subacts){
   const picks = subacts.slice(0,2).map(sa => ({
@@ -351,7 +351,7 @@ function microcardsFor(subacts){
 }
 function suggestExpansions(selectedCats){
   const pool = [
-    { cat:"prepare", title:"Plan for Wildfire : Go Bag" },
+    { cat:"plan", title:"Plan for Wildfire: Go Bag" },
     { cat:"neighbors", title:"Prepare with Neighbors: Firewise Group" },
     { cat:"infra", title:"Improve Infrastructure: Fuel Breaks" }
   ];
@@ -393,7 +393,7 @@ function renderChips(){
     const cat = CATEGORIES.find(c=>c.id===id);
     return `<span class="chip">${cat.icon} ${cat.title}</span>`;
   }).join("");
-  $("#catWarn").style.display = state.selectedCats.length>2 ? "" : "none";
+  $("#catWarn").style.display = "none";
   $("#accordion").style.display = state.selectedCats.length>0 ? "" : "none";
   if (state.selectedCats.length>0) renderAccordion();
 }
@@ -402,11 +402,7 @@ function toggleCategory(id){
   const i = state.selectedCats.indexOf(id);
   if (i>=0){ state.selectedCats.splice(i,1); }
   else{
-    if (state.selectedCats.length>=2){
-      $("#catWarn").style.display = "";
-      return;
-    }
-    state.selectedCats.push(id);
+    state.selectedCats.push(id); // no cap now
   }
   $("#report").style.display="none";
   $("#footerCtas").style.display="none";
@@ -568,8 +564,8 @@ function generateReport(){
 }
 
 function addExpansion(catId){
-  if (!state.selectedCats.includes(catId) && state.selectedCats.length<2){
-    state.selectedCats.push(catId);
+  if (!state.selectedCats.includes(catId)){
+    state.selectedCats.push(catId); // no cap
     const subs = (SUBACTIONS[catId]||[]).slice(0,2).map(sa=>sa.id);
     state.subSelections[catId] = new Set(subs);
     renderCategories();
