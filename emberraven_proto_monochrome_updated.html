@@ -1,0 +1,667 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Ember Raven – Your Personal Resource Navigator</title>
+
+<style>
+/* ===========================
+   WIREFRAME GRAYSCALE THEME
+   =========================== */
+
+/* Neutral palette tokens */
+:root{
+  --bg:#ffffff;          /* page background */
+  --card:#ffffff;        /* card/surface background */
+  --text:#111111;        /* primary text (near-black) */
+  --muted:#666666;       /* secondary text */
+  --border:#d9d9d9;      /* dividers & outlines */
+  --surface:#f6f6f6;     /* subtle panels / section bg */
+
+  /* Keep these for component states, but grayscale */
+  --accent:#111111;      /* used for outlines/primary CTA bg */
+  --accent-2:#111111;    /* link color (will be underlined) */
+  --accent-3:#333333;    /* spare neutral accent */
+  --danger:#333333;      /* neutralized “danger” */
+  --chip:#f3f3f3;        /* chip bg */
+}
+
+/* Base layout/typography */
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--text);
+  font:16px/1.5 system-ui,-apple-system,Segoe UI,Roboto,Roboto,Roboto;
+}
+a{
+  color:var(--text);
+  text-decoration:underline; /* keep affordance in monochrome */
+}
+
+/* Containers */
+header, .container{max-width:980px; margin:0 auto; padding:16px}
+header{
+  display:flex; align-items:center; gap:12px; justify-content:space-between;
+  border-bottom:1px solid var(--border);
+}
+.logo{display:flex; align-items:center; gap:8px; font-weight:700}
+.logo .icon{font-size:24px}
+.nav{display:flex; gap:16px; font-size:14px; color:var(--muted)}
+.hero{padding:24px 16px}
+
+/* Headings/text */
+h1{font-size:28px; margin:0 0 8px}
+.sub{color:var(--muted); margin-bottom:16px}
+
+/* Address block */
+.address{
+  display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:20px;
+}
+.input{
+  background:#fff; border:1px solid var(--border); color:var(--text);
+  padding:12px 14px; border-radius:10px; min-width:260px; flex:1;
+}
+
+/* Buttons */
+.btn{
+  background:#eaeaea; color:var(--text); border:1px solid var(--border);
+  padding:12px 16px; border-radius:10px; font-weight:700; cursor:pointer;
+}
+.btn.secondary{background:#fff; color:var(--text); border:1px solid var(--border)}
+.btn.small{padding:10px 12px; font-size:14px; border-radius:10px}
+.btn.ghost{background:transparent; color:var(--text); border:1px solid var(--border)}
+.btn:hover{filter:brightness(.97)}
+
+/* Grid & cards */
+.grid{
+  display:grid; gap:12px; grid-template-columns:repeat(1, minmax(0,1fr));
+}
+@media (min-width:640px){ .grid{grid-template-columns:repeat(2,1fr)} }
+@media (min-width:900px){ .grid{grid-template-columns:repeat(3,1fr)} }
+
+.card-toggle{
+  background:var(--card); border:1px solid var(--border); border-radius:14px; padding:14px; cursor:pointer;
+  display:flex; gap:12px; align-items:flex-start; position:relative; transition:transform .05s ease;
+}
+.card-toggle:active{transform:scale(.99)}
+.card-toggle[aria-pressed="true"]{ outline:2px solid var(--accent); }
+.card-toggle .ico{font-size:22px; margin-top:2px}
+.card-toggle .title{font-weight:700; margin-bottom:4px}
+.card-toggle .desc{color:var(--muted); font-size:14px}
+
+/* Chips / meta text */
+.chipbar{display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 6px}
+.chip{background:var(--chip); border:1px solid var(--border); border-radius:999px; padding:6px 10px; font-size:13px}
+.warn{color:var(--muted); font-size:13px}
+.section-title{margin:18px 0 8px; font-size:18px; font-weight:800}
+.divider{height:1px; background:var(--border); margin:14px 0}
+.muted{color:var(--muted)}
+
+/* Accordion */
+.accordion{margin:18px 0}
+.acc-item{border:1px solid var(--border); border-radius:14px; margin-bottom:12px; overflow:hidden; background:var(--card)}
+.acc-head{
+  display:flex; align-items:center; justify-content:space-between; padding:14px 16px; cursor:pointer; font-weight:700;
+  background:var(--surface);
+}
+.acc-body{display:none; padding:10px 12px 14px}
+.acc-item[data-open="true"] .acc-body{display:block}
+.subgrid{display:grid; gap:10px; grid-template-columns:repeat(1, minmax(0,1fr))}
+@media (min-width:640px){ .subgrid{grid-template-columns:repeat(2,1fr)} }
+
+.sub-toggle{
+  display:block; width:100%; text-align:left; padding:12px; border-radius:12px; border:1px solid var(--border);
+  background:#fff; color:var(--text); cursor:pointer;
+}
+.sub-toggle[aria-pressed="true"]{background:#f0f0f0; outline:2px solid #333}
+
+/* Report panels & lists */
+.report{margin:22px 0 100px}
+.panel{border:1px solid var(--border); border-radius:14px; margin-bottom:14px; overflow:hidden; background:var(--card)}
+.panel h3{
+  margin:0; padding:14px 16px; background:var(--surface);
+  border-bottom:1px solid var(--border); font-size:16px
+}
+.panel .content{padding:12px}
+.list{display:grid; gap:10px}
+.item{border:1px solid var(--border); border-radius:12px; padding:10px; background:#fff}
+.tag{
+  display:inline-block; padding:2px 8px; border-radius:999px;
+  background:#f3f3f3; border:1px solid var(--border); font-size:12px; color:var(--muted)
+}
+.sprite{display:flex; gap:10px; align-items:flex-start}
+
+/* Sticky footer CTAs */
+.sticky-footer{
+  position:fixed; left:0; right:0; bottom:0; background:#f9f9f9; border-top:1px solid var(--border);
+  padding:10px 16px; display:flex; gap:8px; flex-wrap:wrap; justify-content:center;
+}
+.footer-cta{background:#f0f0f0; border:1px solid var(--border); color:#111; padding:10px 14px; border-radius:10px; cursor:pointer}
+.footer-cta.primary{background:var(--accent); color:#fff; border:1px solid var(--accent)}
+</style>
+</head>
+
+<body>
+  <header>
+    <div class="logo"><span class="icon">🔥</span>Ember Raven – Your Personal Resource Navigator</div>
+    <nav class="nav">
+      <span>How it works</span><span>Get a Plan</span><span>About</span>
+    </nav>
+  </header>
+
+  <div class="container hero">
+    <h1>Plan for Wildfire - Protect What Matters</h1>
+    <p class="sub">Pick what you want to work on; we’ll share with you readiness knowledge, helpful assistance, and local resources tailored to your location.</p>
+
+    <div class="address">
+      <input class="input" id="addr" placeholder="Enter address (optional)" />
+      <button class="btn" id="useAddr">Use Address</button>
+      <button class="btn secondary" id="skipAddr">Skip</button>
+    </div>
+<!-- Map preview -->
+<div id="gmap" style="
+  height:300px;
+  margin-top:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  filter:grayscale(1) contrast(1.05);  /* keeps it wireframe */
+  background:var(--surface);
+"></div>
+    <div class="section-title">What do you want to focus on today? <span class="muted">(Pick any)</span></div>
+    <div id="chips" class="chipbar" aria-live="polite"></div>
+
+    <!-- STEP 1: Categories -->
+    <div id="categories" class="grid" role="group" aria-label="Focus areas">
+      <!-- Cards injected by JS -->
+    </div>
+
+    <p id="catWarn" class="warn" style="display:none"></p>
+
+    <!-- STEP 2: Accordion Wizard (hidden until categories picked) -->
+    <div id="accordion" class="accordion" style="display:none" aria-label="Sub-actions wizard">
+      <!-- Accordion items injected here -->
+    </div>
+
+    <!-- STEP 3: Report -->
+    <div id="report" class="report" style="display:none">
+      <h2 class="section-title">Your Resource Report</h2>
+      <p class="muted" id="reportBasedOn"></p>
+
+      <!-- Emergency -->
+      <div class="panel" id="emergencyPanel">
+        <h3>Emergency Contacts & Alerts</h3>
+        <div class="content list" id="emergencyList"></div>
+      </div>
+
+      <!-- Programs -->
+      <div class="panel" id="assistPanel">
+        <h3>Find Assistance</h3>
+        <div class="content list" id="assistList"></div>
+      </div>
+
+      <!-- Contractors -->
+      <div class="panel" id="contractPanel">
+        <h3>Find Contractors</h3>
+        <div class="content list" id="contractList"></div>
+      </div>
+
+      <!-- Learn More -->
+      <div class="panel">
+        <h3>Learn More</h3>
+        <div class="content list" id="learnList">
+          <div class="item sprite">
+            <div>✨</div>
+            <div><strong>Did you know?</strong><br/>60% of homes ignite from embers, not direct flames.</div>
+          </div>
+          <div class="item"><a href="#" class="muted">Explore all educational resources →</a></div>
+        </div>
+      </div>
+
+      <!-- Expand report -->
+      <div class="panel">
+        <h3>➕ Want to expand your report?</h3>
+        <div class="content list" id="expandList"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sticky footer CTAs -->
+  <div class="sticky-footer" id="footerCtas" style="display:none">
+    <button class="footer-cta">Download Report (PDF)</button>
+    <button class="footer-cta">Find Contractors</button>
+    <button class="footer-cta">Find Assistance</button>
+    <span class="muted" style="flex-basis:100%; text-align:center">Want a complete  Plan? <a href="#">Take 10-min assessment</a> or <a href="#">Book free in-person assessment</a></span>
+  </div>
+
+<script>
+/* ------------------------------
+   Data (placeholder mock)
+   Replace with Airtable/Softr data sources later
+--------------------------------*/
+const CATEGORIES = [
+  { id:"plan",       icon:"🧭", title:"Plan for Wildfire",                     desc:"people, pets, insurance, alerts, livestock" },
+  { id:"harden",     icon:"🏠", title:"Harden Your Home",                      desc:"roofs, windows, siding, gutters, vents" },
+  { id:"defensible", icon:"🛡️", title:"Create Defensible Space (0–30 ft)",    desc:"Zone 0–5, 5–30, hardscape" },
+  { id:"forest",     icon:"🌲", title:"Treat Your Forest (+30 ft)",            desc:"Biochar, fuels, forest mgmt" },
+  { id:"infra",      icon:"🛠️", title:"Improve Your Infrastructure",          desc:"Roads, water, swales, driveway" },
+  { id:"neighbors",  icon:"👥", title:"Prepare with Neighbors",                desc:"Firewise, phone trees, mapping" },
+];
+
+const SUBACTIONS = {
+  plan: [
+    { id:"doc-belongings",   label:"Document Your Belongings", blurb:"Photos, serial numbers, inventory." },
+    { id:"get-notified",     label:"Get Notified when Wildfire is Near", blurb:"Sign up, configure local alerts." },
+    { id:"evac-plan",        label:"Make Your Evacuation Plan", blurb:"Routes, reunification, practice." },
+    { id:"know-responders",  label:"Know Your Responders", blurb:"Fire district, sheriff, emergency contacts." },
+    { id:"go-bag",           label:"Assemble Your Go-Bag", blurb:"Essentials for 72 hours." },
+    { id:"insurance",        label:"Confirm Your Insurance Coverage", blurb:"Coverage, endorsements, photos." },
+    { id:"livestock-plan",   label:"Make a Plan for Livestock", blurb:"Transport, shelter, feed." },
+    { id:"pets-plan",        label:"Make a Plan for Pets", blurb:"Crates, meds, tags, contacts." },
+    { id:"safeguard-docs",   label:"Safeguard Critical Documents", blurb:"Backups, fire safe, cloud." },
+    { id:"smoke-prep",       label:"Prepare for Smoke in the Air", blurb:"Masks, filters, clean room." },
+    { id:"home-assess",      label:"Assess Your Home for Wildfire Risk", blurb:"DIY checklist or pro assessment." },
+  ],
+
+  harden: [
+    { id:"upgrade-doors-windows", label:"Upgrade Doors and Windows", blurb:"Tempered glass, solid doors, seals." },
+    { id:"upgrade-siding",        label:"Upgrade Siding", blurb:"Ignition-resistant materials, repairs." },
+    { id:"replace-vents",         label:"Replace Vents with Metal Mesh", blurb:"≤ 1/8\" mesh to block embers." },
+    { id:"clean-gutters",         label:"Clean Your Gutters", blurb:"Remove needles/leaves regularly." },
+    { id:"safe-way-in-out",       label:"Make a Safe Way In & Out", blurb:"Clear access around entries/exits." },
+    { id:"clean-roof",            label:"Clean Your Roof", blurb:"Clear debris from roof and valleys." },
+  ],
+
+  defensible: [
+    { id:"zone0",                 label:"Clear 0–5 Foot Zone Around House", blurb:"Non-combustible buffer at the wall." },
+    { id:"zone1-landscape",       label:"Create 5–30 Foot Firesafe Landscape", blurb:"Spacing, pruning, reduce fuels." },
+    { id:"add-hardscape",         label:"Add Hardscape around Your Home (Rock, Stone, Gravel)", blurb:"Paths, borders, patios." },
+    { id:"prune-remove-trees",    label:"Prune and Remove Trees", blurb:"Eliminate ladder fuels near home." },
+    { id:"restore-natives",       label:"Restore Native Species", blurb:"Resilient, site-appropriate plants." },
+    { id:"fire-resistant-plants", label:"Find Fire-Reluctant Plants", blurb:"Plant lists, placement guidance." },
+    { id:"rainwater-rooftop",     label:"Harvest Your Rainwater for Rooftop Sprinklers", blurb:"Tanks, pumps, rooftop lines." },
+    { id:"decks-fencing",         label:"Upgrade or Remove Decks and Fencing", blurb:"Break ember pathways." },
+    { id:"irrigate-defensible",   label:"Irrigate your Defensible Space", blurb:"Keep plants hydrated and maintained." },
+  ],
+
+  forest: [
+    { id:"learn-biochar",         label:"Learn About Biochar", blurb:"Benefits, production, soil integration." },
+    { id:"remove-wood-debris",    label:"Remove & Cleanup Wood Debris", blurb:"Slash, piles, disposal/utilization." },
+    { id:"forest-plan",           label:"Make a Forest Management Plan", blurb:"Goals, schedule, prescriptions." },
+    { id:"fuel-breaks",           label:"Create Fuel Breaks", blurb:"Strategic linear reductions." },
+    { id:"itek",                  label:"Integrate Indigenous Traditional Ecological Knowledge (ITEK)", blurb:"TEC-aligned practices." },
+    { id:"introduce-healthy-fire",label:"Introduce Healthy Fire To Your Forest", blurb:"Rx fire with qualified experts." },
+    { id:"restore-waterways",     label:"Restore Your Waterways", blurb:"Stabilize banks, protect riparian zones." },
+    { id:"sustain-logging",       label:"Harvest Your Timber Sustainably", blurb:"Low-impact, compliance, markets." },
+    { id:"reduce-flammable-fuels",label:"Reduce Flammable Fuels on Your Land", blurb:"Thinning, mastication, removal." },
+  ],
+
+  infra: [
+    { id:"manage-water-flow",     label:"Manage Your Water Flow", blurb:"Drainage, culverts, conveyance." },
+    { id:"move-earth",            label:"Move Some Earth", blurb:"Regrade, berms, cut/fill for protection." },
+    { id:"create-bioswales",      label:"Create Bio Swales", blurb:"Slow, spread, sink runoff." },
+    { id:"improve-driveway",      label:"Improve your Driveway", blurb:"Surface, width, turnouts." },
+    { id:"build-access-road",     label:"Build an Access Road", blurb:"Spec for emergency vehicle access." },
+  ],
+
+  neighbors: [
+    { id:"community-liaisons",    label:"Organize a Community Liaisons Program", blurb:"Points-of-contact & info flow." },
+    { id:"phone-tree",            label:"Organize a Neighborhood Phone Tree", blurb:"Rapid neighbor alerts." },
+    { id:"map-risks",             label:"Map Your Community Risks & Resources", blurb:"Shared situational awareness." },
+    { id:"volunteer",             label:"Find Ways to Volunteer", blurb:"Local orgs and work days." },
+    { id:"firewise",              label:"Start or Join a Firewise USA © Community", blurb:"Collective mitigation & education." },
+  ],
+};
+
+/* (JS unchanged below this line) */
+
+function mockEmergency() {
+  return [
+    { name:"Fire District", phone:"(555) 123-4567", link:"https://alerts.example.org" },
+    { name:"County Sheriff", phone:"(555) 765-4321", link:"https://sheriff.example.org" },
+    { name:"Local Alerts", phone:"", link:"https://signup.example.org" },
+  ];
+}
+function mockPrograms(selectedCats, subacts) {
+  const base = [
+    { name:"Defensible Space Rebate", desc:"Cost-share for near-home clearing.", tags:["Deadline Sept 30","Verified Aug 2025"], match:["defensible"] },
+    { name:"Home Hardening Grant", desc:"Offsets vent/window upgrades.", tags:["Open Now","Verified Aug 2025"], match:["harden"] },
+    { name:"Forest Thinning Cost-Share", desc:"Per-acre support for fuels reduction.", tags:["Waitlist","Verified Aug 2025"], match:["forest"] },
+    { name:"Community Mini-Grant", desc:"Neighborhood Firewise projects.", tags:["Quarterly","Verified Aug 2025"], match:["neighbors"] },
+  ];
+  return base.filter(p => p.match.some(m => selectedCats.includes(m)));
+}
+function mockContractors(selectedCats, subacts) {
+  const base = [
+    { name:"Evergreen Arborists", services:["Prune and Remove Trees","Arborist / Tree Removal"], area:"Jackson/Josephine", status:"Verified Aug 2025" },
+    { name:"SparkSafe Roofing", services:["Clean Your Roof","Clean Your Gutters","Replace Vents with Metal Mesh"], area:"Rogue Valley", status:"Insured" },
+    { name:"ShieldScape", services:["Clear 0–5 Foot Zone Around House","Add Hardscape around Your Home (Rock, Stone, Gravel)","Upgrade or Remove Decks and Fencing"], area:"Applegate", status:"Community Verified" },
+    { name:"LandCare Fuels", services:["Reduce Flammable Fuels on Your Land","Remove & Cleanup Wood Debris"], area:"South County", status:"Verified Aug 2025" },
+  ];
+  return base.filter(c => c.services.some(s => subacts.some(sa => s.label && s.includes(sa.label))));
+}
+function microcardsFor(subacts){
+  const picks = subacts.slice(0,2).map(sa => ({
+    title: sa.label,
+    why: sa.label.includes("Vent") ? "Embers enter openings > 1/8\"." : "Reduces ember ignition risk.",
+    how: sa.label.includes("Vent") ? "Install ember-resistant mesh vents." : "Remove fuels and maintain clearances.",
+    link: "#"
+  }));
+  if (picks.length===0) picks.push({title:"Firesafe Landscaping", why:"Plants near walls act like kindling.", how:"Swap bark mulch for gravel near siding.", link:"#"});
+  return picks;
+}
+function suggestExpansions(selectedCats){
+  const pool = [
+    { cat:"plan", title:"Plan for Wildfire: Go Bag" },
+    { cat:"neighbors", title:"Prepare with Neighbors: Firewise Group" },
+    { cat:"infra", title:"Improve Infrastructure: Fuel Breaks" }
+  ];
+  return pool.filter(s => !selectedCats.includes(s.cat)).slice(0,2);
+}
+
+/* ------------------------------
+   State & rendering
+--------------------------------*/
+const state = { address:null, selectedCats:[], subSelections:{} };
+const $ = sel => document.querySelector(sel);
+const $$ = sel => Array.from(document.querySelectorAll(sel));
+
+function renderCategories(){
+  const wrap = $("#categories");
+  wrap.innerHTML = "";
+  CATEGORIES.forEach(cat=>{
+    const card = document.createElement("button");
+    card.className="card-toggle";
+    card.type="button";
+    card.setAttribute("role","button");
+    card.setAttribute("aria-pressed", state.selectedCats.includes(cat.id) ? "true":"false");
+    card.dataset.cat = cat.id;
+    card.innerHTML = `
+      <div class="ico">${cat.icon}</div>
+      <div>
+        <div class="title">${cat.title}</div>
+        <div class="desc">${cat.desc}</div>
+      </div>`;
+    card.addEventListener("click", ()=>toggleCategory(cat.id));
+    wrap.appendChild(card);
+  });
+  renderChips();
+}
+
+function renderChips(){
+  const chipbar = $("#chips");
+  chipbar.innerHTML = state.selectedCats.map(id=>{
+    const cat = CATEGORIES.find(c=>c.id===id);
+    return `<span class="chip">${cat.icon} ${cat.title}</span>`;
+  }).join("");
+  $("#catWarn").style.display = "none";
+  $("#accordion").style.display = state.selectedCats.length>0 ? "" : "none";
+  if (state.selectedCats.length>0) renderAccordion();
+}
+
+function toggleCategory(id){
+  const i = state.selectedCats.indexOf(id);
+  if (i>=0){ state.selectedCats.splice(i,1); }
+  else{
+    state.selectedCats.push(id); // no cap now
+  }
+  $("#report").style.display="none";
+  $("#footerCtas").style.display="none";
+  renderCategories();
+}
+
+function renderAccordion(){
+  const acc = $("#accordion");
+  acc.innerHTML = "";
+  state.selectedCats.forEach((catId, idx)=>{
+    const cat = CATEGORIES.find(c=>c.id===catId);
+    const open = idx===0 ? "true" : "false";
+    const item = document.createElement("div");
+    item.className="acc-item";
+    item.dataset.cat = catId;
+    item.setAttribute("data-open", open);
+
+    const subs = SUBACTIONS[catId] || [];
+    const subHtml = subs.map(sa=>{
+      const pressed = state.subSelections[catId]?.has(sa.id) ? "true":"false";
+      return `<button type="button" class="sub-toggle" role="button" aria-pressed="${pressed}" data-sub="${sa.id}">
+        <strong>${sa.label}</strong><br><span class="muted">${sa.blurb}</span>
+      </button>`;
+    }).join("");
+
+    item.innerHTML = `
+      <div class="acc-head" role="button" aria-controls="body-${catId}" aria-expanded="${open}">
+        <span>${cat.icon} ${cat.title}</span>
+        <span>▼</span>
+      </div>
+      <div id="body-${catId}" class="acc-body">
+        <div class="subgrid">${subHtml}</div>
+        <div class="acc-actions">
+          <button class="btn small ghost" data-act="skip">Skip</button>
+          <button class="btn small" data-act="continue">Continue</button>
+        </div>
+      </div>
+    `;
+    acc.appendChild(item);
+  });
+
+  $$("#accordion .acc-head").forEach(head=>{
+    head.addEventListener("click", ()=>{
+      const item = head.parentElement;
+      const isOpen = item.getAttribute("data-open")==="true";
+      item.setAttribute("data-open", isOpen?"false":"true");
+    });
+  });
+  $$("#accordion .sub-toggle").forEach(btn=>{
+    btn.addEventListener("click", ()=>{
+      const catId = btn.closest(".acc-item").dataset.cat;
+      const subId = btn.dataset.sub;
+      state.subSelections[catId] ||= new Set();
+      if (btn.getAttribute("aria-pressed")==="true"){
+        btn.setAttribute("aria-pressed","false");
+        state.subSelections[catId].delete(subId);
+      } else {
+        btn.setAttribute("aria-pressed","true");
+        state.subSelections[catId].add(subId);
+      }
+    });
+  });
+  $$("#accordion .acc-actions .btn").forEach(b=>{
+    b.addEventListener("click", ()=>{
+      const action = b.dataset.act;
+      const item = b.closest(".acc-item");
+      const all = $$("#accordion .acc-item");
+      const idx = all.indexOf(item);
+      if (action==="continue" || action==="skip"){
+        item.setAttribute("data-open","false");
+        const next = all[idx+1];
+        if (next){ next.setAttribute("data-open","true"); next.scrollIntoView({behavior:"smooth",block:"start"}); }
+        else { generateReport(); document.getElementById("report").scrollIntoView({behavior:"smooth",block:"start"}); }
+      }
+    });
+  });
+}
+
+function generateReport(){
+  const cats = [...state.selectedCats];
+  const subacts = [];
+  cats.forEach(c=>{
+    const ids = [...(state.subSelections[c]||[])];
+    const full = (SUBACTIONS[c]||[]).filter(sa=>ids.includes(sa.id));
+    subacts.push(...full);
+  });
+
+  const catTitles = cats.map(id=>CATEGORIES.find(c=>c.id===id).title).join(" + ");
+  $("#reportBasedOn").textContent = `Based on your focus: ${catTitles}`;
+
+  const emergency = mockEmergency();
+  const $elist = $("#emergencyList");
+  $elist.innerHTML = emergency.map(e=>`
+    <div class="item">
+      <strong>${e.name}</strong><br/>
+      ${e.phone?`📞 ${e.phone} &nbsp;`:''}${e.link?`<a href="${e.link}">Website/Alerts →</a>`:''}
+    </div>
+  `).join("");
+
+  const programs = mockPrograms(cats, subacts);
+  const $plist = $("#assistList");
+  $plist.innerHTML = programs.length ? programs.map(p=>`
+    <div class="item">
+      <strong>💰 ${p.name}</strong><br/>
+      <span class="muted">${p.desc}</span><br/>
+      ${p.tags.map(t=>`<span class="tag">${t}</span>`).join(' ')}
+      <div style="margin-top:6px"><a href="#">Apply / Learn more →</a></div>
+    </div>
+  `).join("") : `<div class="item">No programs right now. Try another focus area.</div>`;
+
+  const contr = mockContractors(cats, subacts);
+  const $clist = $("#contractList");
+  if (!contr.length){
+    $clist.innerHTML = `<div class="item">No contractors found nearby — try refining or another focus area.</div>`;
+  } else {
+    const first = contr.slice(0,10);
+    $clist.innerHTML = first.map(c=>`
+      <div class="item">
+        <strong>👷 ${c.name}</strong><br/>
+        Services: ${c.services.map(s=>`<span class="tag">${s}</span>`).join(' ')}<br/>
+        Area: ${c.area} &nbsp; • &nbsp; Status: ${c.status}
+      </div>
+    `).join("");
+    if (contr.length>10){
+      $clist.innerHTML += `
+        <div class="item">
+          We found ${contr.length} contractors near you.
+          <div style="margin-top:6px">
+            <button class="btn small">Filter by Distance</button>
+            <button class="btn small">Filter by Budget</button>
+            <button class="btn small">Filter by Availability</button>
+          </div>
+        </div>`;
+    }
+  }
+
+  const micros = microcardsFor(subacts);
+  const $learn = $("#learnList");
+  const extra = micros.map(m=>`
+    <div class="item">
+      <strong>📚 ${m.title}</strong><br/>
+      <em>Why:</em> ${m.why}<br/>
+      <em>How:</em> ${m.how}<br/>
+      <a href="${m.link}">Read full guide →</a>
+    </div>`).join("");
+  $learn.insertAdjacentHTML("afterbegin", extra);
+
+  const sugg = suggestExpansions(cats);
+  const $exp = $("#expandList");
+  $exp.innerHTML = sugg.map(s=>`
+    <div class="item">
+      <strong>${s.title}</strong><br/>
+      <button class="btn small" onclick="addExpansion('${s.cat}')">Add to Report →</button>
+    </div>
+  `).join("");
+
+  $("#report").style.display="";
+  $("#footerCtas").style.display="";
+}
+
+function addExpansion(catId){
+  if (!state.selectedCats.includes(catId)){
+    state.selectedCats.push(catId); // no cap
+    const subs = (SUBACTIONS[catId]||[]).slice(0,2).map(sa=>sa.id);
+    state.subSelections[catId] = new Set(subs);
+    renderCategories();
+    renderAccordion();
+  }
+  generateReport();
+}
+
+/* ------------------------------
+   Initialize
+--------------------------------*/
+function init(){
+  renderCategories();
+  $("#useAddr").addEventListener("click", ()=>{
+    state.address = $("#addr").value || null;
+    alert(state.address ? `Using address: ${state.address}` : "No address provided.");
+  });
+  $("#skipAddr").addEventListener("click", ()=>{
+    state.address = null;
+    alert("Continuing without an address.");
+  });
+}
+init();
+</script>
+   <script>
+let gmap, gmarker, geocoder, autocomplete;
+
+function initGMap() {
+  // Base map centered near Southern Oregon; change if you like
+  gmap = new google.maps.Map(document.getElementById('gmap'), {
+    center: { lat: 42.4, lng: -123.3 },
+    zoom: 9,
+    mapTypeControl: false,
+    streetViewControl: false,
+  });
+
+  geocoder = new google.maps.Geocoder();
+
+  const addrInput = document.getElementById('addr');
+  if (addrInput) {
+    // Places Autocomplete on your address input
+    autocomplete = new google.maps.places.Autocomplete(addrInput, {
+      fields: ['geometry', 'formatted_address'],
+      types: ['geocode'],
+    });
+    autocomplete.addListener('place_changed', () => {
+      const place = autocomplete.getPlace();
+      if (!place.geometry || !place.geometry.location) return;
+      const loc = place.geometry.location;
+      showGoogleMarker(loc.lat(), loc.lng(), place.formatted_address);
+      // keep your state in sync if present
+      if (window.state) state.address = place.formatted_address;
+    });
+  }
+
+  // Wire up your existing buttons
+  document.getElementById('useAddr')?.addEventListener('click', () => {
+    const addr = document.getElementById('addr')?.value?.trim();
+    if (!addr) { alert('Please enter an address.'); return; }
+    geocoder.geocode({ address: addr }, (results, status) => {
+      if (status !== 'OK' || !results?.length) {
+        alert('Address not found. Try a more specific address.');
+        return;
+      }
+      const r = results[0];
+      const loc = r.geometry.location;
+      showGoogleMarker(loc.lat(), loc.lng(), r.formatted_address);
+      if (window.state) state.address = r.formatted_address;
+    });
+  });
+
+  document.getElementById('skipAddr')?.addEventListener('click', () => {
+    gmap.setCenter({ lat: 42.4, lng: -123.3 });
+    gmap.setZoom(9);
+    if (gmarker) { gmarker.setMap(null); gmarker = null; }
+    if (window.state) state.address = null;
+  });
+}
+
+function showGoogleMarker(lat, lng, title) {
+  const pos = { lat, lng };
+  if (!gmarker) {
+    gmarker = new google.maps.Marker({ position: pos, map: gmap, title });
+  } else {
+    gmarker.setPosition(pos);
+    gmarker.setTitle(title);
+  }
+  gmap.setCenter(pos);
+  gmap.setZoom(15);
+}
+</script>
+
+<!-- Load Google Maps JS: replace AIzaSyByDbhJBYGR51Az_uDMhIn0J7AoXYbW5cs -->
+<script async
+  src="https://maps.googleapis.com/maps/api/js?key=AIzaSyByDbhJBYGR51Az_uDMhIn0J7AoXYbW5cs&libraries=places&callback=initGMap">
+</script>
+
+</body>
+</html>
