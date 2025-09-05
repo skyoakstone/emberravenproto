@@ -579,14 +579,11 @@ function addExpansion(catId){
 --------------------------------*/
 function init(){
   renderCategories();
-document.getElementById("confirmAddr").addEventListener("click", () => {
-  const addr = document.getElementById("addr")?.value?.trim();
-  if (addr) {
-    state.address = addr;
-    alert(`Address confirmed: ${addr}`);
-  } else {
-    alert("Please enter an address first.");
-  }
+document.getElementById('confirmAddr')?.addEventListener('click', () => {
+  const addr = document.getElementById('addr')?.value?.trim();
+  if (!addr) { alert('Please enter an address or use autocomplete.'); return; }
+  state.address = addr;
+  alert(`Address confirmed: ${addr}`);
 });
 
   $("#skipAddr").addEventListener("click", ()=>{
