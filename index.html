@@ -239,12 +239,12 @@ h1{font-size:28px; margin:0 0 8px}
    Replace with Airtable/Softr data sources later
 --------------------------------*/
 const CATEGORIES = [
-  { id:"prepare", icon:"🧭", title:"Prepare for Wildfire ", desc:"Plans, insurance, pets, go-bags" },
+  { id:"prepare", icon:"🧭", title:"Plan for Wildfire ", desc:"Plans, insurance, pets, go-bags" },
   { id:"harden", icon:"🏠", title:"Harden Your Home", desc:"Roof, gutters, vents, windows" },
-  { id:"defensible", icon:"🛡️", title:"Create Defensible Space", desc:"Near-home landscaping & hardscape" },
-  { id:"treat", icon:"🌲", title:"Treat Your Land", desc:"Thinning, biomass cleanup, restoration" },
+  { id:"defensible", icon:"🛡️", title:"Create Defensible Space (0-30 Feet) (0-30 Feet) (0-30 Feet)", desc:"Near-home landscaping & hardscape" },
+  { id:"treat", icon:"🌲", title:"Treat Your Forest (+30 Feet)", desc:"Thinning, biomass cleanup, restoration" },
   { id:"infra", icon:"🚰", title:"Improve Infrastructure", desc:"Fuel breaks, roads, irrigation" },
-  { id:"neighbors", icon:"👥", title:"Work with Neighbors", desc:"Firewise, phone trees, mapping" },
+  { id:"neighbors", icon:"👥", title:"Prepare with Neighbors", desc:"Firewise, phone trees, mapping" },
 ];
 
 const SUBACTIONS = {
@@ -336,8 +336,8 @@ function microcardsFor(subacts){
 }
 function suggestExpansions(selectedCats){
   const pool = [
-    { cat:"prepare", title:"Prepare for Wildfire : Go Bag" },
-    { cat:"neighbors", title:"Work with Neighbors: Firewise Group" },
+    { cat:"prepare", title:"Plan for Wildfire : Go Bag" },
+    { cat:"neighbors", title:"Prepare with Neighbors: Firewise Group" },
     { cat:"infra", title:"Improve Infrastructure: Fuel Breaks" }
   ];
   return pool.filter(s => !selectedCats.includes(s.cat)).slice(0,2);
