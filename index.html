@@ -155,7 +155,7 @@ h1{font-size:28px; margin:0 0 8px}
 
     <div class="address">
       <input class="input" id="addr" placeholder="Enter address (optional)" />
-      <button class="btn" id="useAddr">Confirm Address</button>
+     <button class="btn" id="confirmAddr">Confirm Address</button>
       <button class="btn secondary" id="skipAddr">Skip</button>
     </div>
 <!-- Map preview -->
@@ -628,20 +628,11 @@ function initGMap() {
   }
 
   // Wire up your existing buttons
-  document.getElementById('useAddr')?.addEventListener('click', () => {
-    const addr = document.getElementById('addr')?.value?.trim();
-    if (!addr) { alert('Please enter an address.'); return; }
-    geocoder.geocode({ address: addr }, (results, status) => {
-      if (status !== 'OK' || !results?.length) {
-        alert('Address not found. Try a more specific address.');
-        return;
-      }
-      const r = results[0];
-      const loc = r.geometry.location;
-      showGoogleMarker(loc.lat(), loc.lng(), r.formatted_address);
-      if (window.state) state.address = r.formatted_address;
-    });
-  });
+document.getElementById('confirmAddr')?.addEventListener('click', (e) => {
+  const btn = e.target;
+  btn.textContent = "✅ Address Confirmed";
+  btn.disabled = true; // optional: lock it so it can’t be clicked again
+});
 
   document.getElementById('skipAddr')?.addEventListener('click', () => {
     gmap.setCenter({ lat: 42.4, lng: -123.3 });
